@@ -1,4 +1,4 @@
-import { Elysia } from 'elysia'
+import { Hono } from 'hono'
 import app from '../src'
 
 // Configure as Edge Function
@@ -6,18 +6,16 @@ export const config = {
   runtime: 'edge'
 }
 
-// Create a handler that doesn't call .listen()
-// but uses the same routes as your main app
-const handler = new Elysia()
-  .get('/', () => 'Hello from Elysia on Vercel Edge!')
-  .get('/api/hello', () => {
-    return {
-      message: 'Hello from API endpoint',
-      timestamp: new Date()
-    }
-  })
+// Using the mount pattern explained in the Elysia docs, but with Hono
+// Create an API handler for edge deployment
+const api = new Hono()
+  // Mount the main app at the root path
+  .route('/', app)
+  // You can also add edge-specific routes here
+  .get('/edge-only', (c) => c.json({
+    message: 'This route only exists in the edge deployment',
+    environment: 'edge'
+  }))
 
-// Export the request handler function
-export default function(request: Request) {
-  return handler.handle(request)
-}
+// Export the fetch handler for Vercel Edge Functions
+export default api.fetch

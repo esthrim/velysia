@@ -1,17 +1,21 @@
-import { Elysia } from 'elysia'
+import { Hono } from 'hono'
 
-// This is your main Elysia app that you'll use for development
-const app = new Elysia()
-  .get('/', () => 'Hello from Elysia!')
-  .get('/api/hello', () => {
-    return {
-      message: 'Hello from API endpoint',
-      timestamp: new Date()
-    }
+// This is your main app for local development
+const app = new Hono()
+  .get('/', (c) => c.text('Hello from Hono!'))
+  .get('/api/hello', (c) => c.json({
+    message: 'Hello from API endpoint',
+    timestamp: new Date()
+  }))
+
+// For local development (when run directly)
+if (import.meta.main) {
+  console.log("🚀 Server is running at http://localhost:3000")
+  Bun.serve({
+    port: 3000,
+    fetch: app.fetch
   })
-  .listen(3000)
+}
 
-console.log(`🦊 Elysia server is running at http://localhost:${app.server?.port}`)
-
-// Export the app for use in Vercel
+// Export the app for use in the edge function
 export default app
