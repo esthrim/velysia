@@ -1,10 +1,14 @@
 {
+  "version": 2,
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
   "functions": {
     "api/*.ts": {
-      "runtime": "edge"
+      "memory": 1024,
+      "maxDuration": 10
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/(.*)", "destination": "/api/index.ts" }
   ]
 }
